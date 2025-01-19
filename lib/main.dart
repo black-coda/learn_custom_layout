@@ -5,40 +5,49 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const StripedBackground());
+  runApp(
+    const FlutterLogoUppr(),
+  );
 }
 
+class FlutterLogoUppr extends StatelessWidget {
+  const FlutterLogoUppr({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(child: FlutterLogo()),
+      ),
+    );
+  }
+}
 
 class StripedBackground extends StatelessWidget {
-  const StripedBackground({super.key});
+  const StripedBackground(
+    this.height,
+    this.width, {
+    super.key,
+    this.spacing,
+  });
 
+  final double height;
+  final double width;
+  final double? spacing;
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection:
           TextDirection.ltr, // Use TextDirection.rtl for right-to-left
-      child: Scaffold(
-        body: CustomPaint(
-          size: Size(double.infinity, 100),
-          painter: StripedPainter(),
-        ),
+      child: CustomPaint(
+        size: Size(width, height),
+        painter: StripedPainter(spacing: spacing),
       ),
     );
   }
 }
-// class StripedBackground extends StatelessWidget {
-//   const StripedBackground({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: CustomPaint(
-//         size: Size(double.infinity, 100), // Set desired height
-//         painter: StripedPainter(),
-//       ),
-//     );
-//   }
-// }
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -77,6 +86,21 @@ class MainApp extends StatelessWidget {
                     ),
                   ),
                 ),
+                Positioned(
+                    left: MediaQuery.sizeOf(context).width * 0.45,
+                    bottom: -5,
+                    child: const StripedBackground(30.0, 150, spacing: 16)),
+                Positioned(
+                    left: -189,
+                    top: 280,
+                    child: Transform.rotate(
+                      angle: math.pi / 2,
+                      child: StripedBackground(
+                        30.0,
+                        MediaQuery.sizeOf(context).width * 0.3,
+                        spacing: 13,
+                      ),
+                    )),
                 Positioned(
                   top: MediaQuery.sizeOf(context).height * 0.3,
                   right: 0,
@@ -370,10 +394,12 @@ class QuadraticBezierCurvePainter extends CustomPainter {
 }
 
 class StripedPainter extends CustomPainter {
+  const StripedPainter({this.spacing});
+  final double? spacing;
   @override
   void paint(Canvas canvas, Size size) {
     final Paint backgroundPaint = Paint()
-      ..color = Colors.blue // Background color
+      ..color = Colors.transparent // Background color
       ..style = PaintingStyle.fill;
 
     // Draw the background
@@ -381,14 +407,13 @@ class StripedPainter extends CustomPainter {
         Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
     final Paint stripePaint = Paint()
-      ..color = Colors.lightGreenAccent // Stripe color
-      ..strokeWidth = 5.0; // Thickness of the stripes
+      ..color = const Color(0xff7DA5A5) // Stripe color
+      ..strokeWidth = 4.5; // Thickness of the stripes
 
     // Define spacing between stripes
-    const double spacing = 20.0;
 
     // Draw diagonal stripes
-    for (double i = -size.height; i < size.width; i += spacing) {
+    for (double i = -size.height; i < size.width; i += spacing ?? 20) {
       canvas.drawLine(
         Offset(i, 0), // Start point
         Offset(i + size.height, size.height), // End point
@@ -399,4 +424,55 @@ class StripedPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class FlutterLogo extends StatelessWidget {
+  const FlutterLogo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey.shade200,
+      height: 100,
+      width: 100,
+      child: CustomPaint(
+        painter: FlutterLogoPainter(),
+        size: const Size(100, 100),
+      ),
+    );
+  }
+}
+
+class FlutterLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final layer1Paint = Paint()
+      ..color = const Color(0xff54C5F8)
+      ..style = PaintingStyle.fill;
+
+    final layer2Paint = Paint()
+      ..color = const Color(0xff01579B)
+      ..style = PaintingStyle.fill;
+
+    final x = size.width;
+    final y = size.height;
+    final layer1Path = Path()
+      ..moveTo(x * .6, 0)
+      ..lineTo(x * .8, 0)
+      ..lineTo(x * .3, y * .6)
+      ..lineTo(x * .2, y * .5)
+      ..close();
+
+    final layer2Path = Path()
+      ..moveTo(x * .3, y * .6)
+      ..lineTo(x * .4, y * 0.68)
+      ..lineTo(x * .6, y * 0.4)
+      ..lineTo(x * .3, y * 0.3)
+      ..close();
+    canvas.drawPath(layer1Path, layer1Paint);
+    canvas.drawPath(layer2Path, layer2Paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
